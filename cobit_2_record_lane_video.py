@@ -31,7 +31,7 @@ servo_offset = 15
 for i in range(3):
 	_, frame = cap.read()
      
-motor.motor_all_start(20)
+motor.motor_all_start(50)
 
 while True:
 	ret, img_org = cap.read()

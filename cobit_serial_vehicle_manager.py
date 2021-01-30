@@ -1,6 +1,13 @@
 #-*- coding:utf-8 -*-
 import serial 
 from threading import Thread
+from adafruit_servokit import ServoKit
+from cobit_car_motor_l9110 import CobitCarMotorL9110
+
+servo = ServoKit(channels=16)
+servo_offset = 0
+
+motor = CobitCarMotorL9110()
 
 class SerialVehicleManager(Thread):
 
@@ -29,7 +36,16 @@ class SerialVehicleManager(Thread):
                     if self.seq.inWaiting():
                         try:
                             self.command = self.seq.readline()
-                            print(self.command)
+                            angle = self.get_angle()
+                            if angle is not -1:
+                                print(angle)
+                                servo.servo[0].angle = angle + servo_offset
+
+                            throttle = self.get_throttle()
+                            if throttle is not -1:
+                                print(throttle)
+                                motor.motor_all_start(throttle)
+
                         except AttributeError:
                             print("attr error")
                 except IOError:
@@ -54,6 +70,35 @@ class SerialVehicleManager(Thread):
 
     def get_serial_port(self):
         return self.seq.port
+
+    def get_angle(self):
+        cmd = str(self.command)
+        start = cmd.find('x')
+        end = cmd.find('y')
+        if start is not -1 and end is not -1:
+            joy_num = int(cmd[start+1:end])
+            angle = joy_num/10 + 40 
+            return angle
+        else:
+            return -1
+
+    def get_throttle(self):
+        cmd = str(self.command)
+        start = cmd.find('y')
+        end = cmd.find('z')
+        if start is not -1 and end is not -1:
+            throttle_num = int(cmd[start+1:end])
+            throttle = throttle_num/10
+            return throttle
+        else:
+            return -1
+
+    def finish(self):
+        servo.servo[0].angle = 90+servo_offset
+        motor.motor_all_start(0)
+
+
+        
 
 if __name__ =='__main__':
     vehicle = SerialVehicleManager("/dev/ttyUSB0")

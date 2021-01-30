@@ -33,9 +33,13 @@ class CobitCarMotorL9110():
         self.motor2_pwm.start(0)
     
     def motor1_start(self, speed):
+        if speed > 100:
+            speed = 100
         self.motor1_pwm.ChangeDutyCycle(speed)
 
     def motor2_start(self, speed):
+        if speed > 100:
+            speed = 100
         self.motor2_pwm.ChangeDutyCycle(speed)
 
     def motor_all_start(self, speed):

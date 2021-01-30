@@ -6,13 +6,9 @@ import serial
 import threading
 #from threading import Thread 
 import time
-from adafruit_servokit import ServoKit
-from cobit_car_motor_l9110 import CobitCarMotorL9110
 from cobit_serial_vehicle_manager import SerialVehicleManager
 #from cobit_opencv_cam_rc import CobitOpenCVCamRC
 
-motor = CobitCarMotorL9110()
-servo = ServoKit(channels=16)
 vehicle = SerialVehicleManager("/dev/ttyUSB0")
 #cam = CobitOpenCVCamRC()
 
@@ -51,6 +47,7 @@ while True:
     else:
         print("cap error")
 cap.release()
+vehicle.finish()
 cv2.destroyAllWindows()
 
    
