@@ -38,13 +38,22 @@ class SerialVehicleManager(Thread):
                             self.command = self.seq.readline()
                             angle = self.get_angle()
                             if angle is not -1:
-                                print(angle)
+                                #print(angle)
                                 servo.servo[0].angle = angle + servo_offset
 
                             throttle = self.get_throttle()
                             if throttle is not -1:
-                                print(throttle)
-                                motor.motor_all_start(throttle)
+                                if throttle > 55:
+                                    throttle -= 50
+                                    throttle *= 2
+                                    #print(throttle)
+                                    motor.motor_move_forward(throttle)
+                                elif throttle < 45:
+                                    throttle = 100- throttle*2
+                                    print(throttle)
+                                    motor.motor_move_backward(throttle)
+                                elif throttle > 40 and throttle < 60:
+                                    motor.motor_stop()
 
                         except AttributeError:
                             print("attr error")
